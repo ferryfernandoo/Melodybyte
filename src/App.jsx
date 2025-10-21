@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
+// Add animation keyframes to the style tag
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fade-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide-up {
+    animation: fade-slide-up 0.5s ease-out forwards;
+    opacity: 0;
+  }
+`;
+document.head.appendChild(style);
+
 const formatDuration = (seconds) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
@@ -88,6 +109,51 @@ function Sidebar() {
     </div>
   );
 }
+
+const LazyLoad = ({ children }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  const elementRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(false); // Reset when out of view for re-animation
+        }
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => {
+      if (elementRef.current) {
+        observer.unobserve(elementRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={elementRef}
+      className={`transition-all duration-700 ${
+        isVisible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-10'
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
 
 function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSelectArtist }) {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -254,13 +320,13 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
         {Array.from(new Set(musicLibrary.map(song => song.artist))).map(artist => {
           const artistSongs = musicLibrary.filter(song => song.artist === artist);
           return (
-            <div 
-              key={artist} 
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectArtist(artist);
-              }}
-              className="bg-white/30 backdrop-blur-md rounded-2xl p-4 hover:bg-white/40 transition-all duration-300 group hover:scale-[1.02] cursor-pointer"
+            <LazyLoad key={artist}>
+              <div 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectArtist(artist);
+                }}
+                className="bg-white/30 backdrop-blur-md rounded-2xl p-4 hover:bg-white/40 transition-all duration-300 group hover:scale-[1.02] cursor-pointer"
             >
               <div className="flex items-start space-x-4">
                 <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 relative rounded-xl overflow-hidden group-hover:shadow-xl transition-all">
@@ -313,6 +379,7 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
                 </div>
               </div>
             </div>
+            </LazyLoad>
           );
         })}
       </div>
@@ -639,7 +706,7 @@ function App() {
 
   return (
     <>
-    <div className="h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 relative overflow-hidden">
       <Header onSearchClick={() => setIsSearchModalOpen(true)} />
       <div className="flex-1 flex overflow-hidden pt-16">
         <div className="w-64 flex-shrink-0 hidden md:block">
@@ -661,16 +728,92 @@ function App() {
       </div>
 
       {/* Artist Page */}
-      {selectedArtist && (
-        <ArtistPage
-          artist={selectedArtist}
-          onBack={() => setSelectedArtist(null)}
-          musicLibrary={musicLibrary}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-          onPlayTrack={playTrack}
-        />
-      )}
+      <div
+        className={`fixed inset-0 bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-lg z-50
+          transition-all duration-700 ease-in-out
+          ${selectedArtist 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-full pointer-events-none'
+          }`}
+      >
+        <div 
+          className={`w-full h-full overflow-y-auto transition-all duration-700 delay-100
+            ${selectedArtist ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+        >
+          {selectedArtist && (
+            <div className="max-w-7xl mx-auto px-4 py-8">
+              <button 
+                onClick={() => setSelectedArtist(null)}
+                className="text-white/80 hover:text-white mb-6 flex items-center space-x-2 group transition-all
+                  hover:-translate-x-2 duration-300"
+              >
+                <svg className="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Back to All Artists</span>
+              </button>
+
+              <div className="bg-white/10 rounded-3xl p-8 backdrop-blur-md
+                transform transition-all duration-700 delay-200
+                ${selectedArtist ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}"
+              >
+                <div className="flex items-center space-x-6 mb-8">
+                  <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-purple-500 via-pink-500 to-violet-500 
+                    rounded-2xl flex items-center justify-center shadow-xl transform transition-all duration-700 delay-300
+                    hover:scale-105 hover:rotate-3"
+                  >
+                    <svg className="w-16 h-16 md:w-20 md:h-20 text-white/90" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                    </svg>
+                  </div>
+                  <div className="transform transition-all duration-700 delay-400">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{selectedArtist}</h1>
+                    <p className="text-white/60">{musicLibrary.filter(song => song.artist === selectedArtist).length} songs</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {musicLibrary
+                    .filter(song => song.artist === selectedArtist)
+                    .map((song, index) => (
+                      <div 
+                        key={song.id}
+                        className="group bg-white/5 hover:bg-white/10 rounded-xl p-4 flex items-center space-x-4 
+                          transition-all duration-300 cursor-pointer transform hover:scale-[1.02]
+                          animate-fade-slide-up"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        onClick={() => playTrack(song)}
+                      >
+                        <div className="relative w-12 h-12 bg-gradient-to-br from-purple-500/50 to-pink-500/50 
+                          rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden 
+                          group-hover:scale-105 transition-all duration-300"
+                        >
+                          {currentTrack?.id === song.id && isPlaying ? (
+                            <div className="flex items-center space-x-1">
+                              <span className="w-1 h-8 bg-white/90 rounded-full animate-music-bar-1"></span>
+                              <span className="w-1 h-8 bg-white/90 rounded-full animate-music-bar-2"></span>
+                              <span className="w-1 h-8 bg-white/90 rounded-full animate-music-bar-3"></span>
+                            </div>
+                          ) : (
+                            <svg className="w-6 h-6 text-white/90 group-hover:scale-110 transition-transform duration-300" 
+                              fill="currentColor" viewBox="0 0 24 24"
+                            >
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-white font-medium truncate">{song.name}</h3>
+                          <p className="text-white/60 text-sm truncate">{formatDuration(song.duration)}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Search Modal */}
       <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 z-50 ${isSearchModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
