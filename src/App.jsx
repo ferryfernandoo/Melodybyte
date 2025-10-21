@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 // Add animation keyframes to the style tag
 const style = document.createElement('style');
+// Add Latin style font
+const fontLink = document.createElement('link');
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap';
+fontLink.rel = 'stylesheet';
+document.head.appendChild(fontLink);
+
 style.textContent = `
   @keyframes fade-slide-up {
     from {
@@ -64,8 +70,8 @@ function Header({ onSearchClick }) {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-sans drop-shadow-sm animate-gradient-x">
-              MelodyBeats
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-['Cinzel_Decorative'] drop-shadow-sm animate-gradient-x tracking-wide">
+              MelodyByte
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -278,7 +284,7 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6 text-purple-900">Welcome to MelodyBeats</h1>
+      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-['Cinzel_Decorative']">Welcome to MelodyByte</h1>
 
       {/* For You Section */}
       <div className="mb-8">
