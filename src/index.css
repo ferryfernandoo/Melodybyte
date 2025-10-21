@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+@keyframes music-bar-1 {
+  0%, 100% { transform: translateY(0) translateX(-8px); }
+  50% { transform: translateY(-4px) translateX(-8px); }
+}
+
+@keyframes music-bar-2 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes music-bar-3 {
+  0%, 100% { transform: translateY(0) translateX(8px); }
+  50% { transform: translateY(-6px) translateX(8px); }
+}
+
+@layer utilities {
+  .animate-gradient-x {
+    animation: gradient-x 15s ease infinite;
+  }
+  .animate-music-bar-1 {
+    animation: music-bar-1 1.2s ease-in-out infinite;
+  }
+  .animate-music-bar-2 {
+    animation: music-bar-2 1s ease-in-out infinite;
+  }
+  .animate-music-bar-3 {
+    animation: music-bar-3 0.8s ease-in-out infinite;
+  }
+}
