@@ -20,9 +20,95 @@ style.textContent = `
     }
   }
 
+  @keyframes scale-fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes blur-fade-in {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0);
+      background-opacity: 0;
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+      background-opacity: 1;
+    }
+  }
+
   .animate-fade-slide-up {
     animation: fade-slide-up 0.5s ease-out forwards;
     opacity: 0;
+  }
+
+  .animate-scale-fade-in {
+    animation: scale-fade-in 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-blur-fade-in {
+    animation: blur-fade-in 0.8s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
   }
 `;
 document.head.appendChild(style);
@@ -70,7 +156,7 @@ function Header({ onSearchClick }) {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-['Cinzel_Decorative'] drop-shadow-sm animate-gradient-x tracking-wide">
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent font-['Cinzel_Decorative'] drop-shadow-sm animate-gradient-x tracking-wider">
               MelodyByte
             </h1>
           </div>
@@ -200,7 +286,7 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
   const forYouSongs = shuffleArray(musicLibrary).slice(0, 4);
 
   return (
-    <div className="bg-gradient-to-br from-purple-50/50 via-white to-indigo-50/50 text-gray-800 pt-20 px-4">
+    <div className="bg-gradient-to-br from-purple-200/70 via-pink-100 to-indigo-200/70 text-gray-800 pt-20 px-4">
       <div className="flex flex-col space-y-6 mb-8">
         <div className="flex items-center justify-between">
           <div className="flex space-x-4">
@@ -227,13 +313,13 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
           </div>
         </div>
 
-        <div className="relative w-full max-w-2xl mx-auto">
+        <div className="relative w-full max-w-2xl mx-auto animate-fade-slide-up animation-delay-200">
           <input
             type="text"
             placeholder="Search for songs or artists..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-6 py-3 bg-white/80 backdrop-blur-sm border border-purple-100 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+            className="w-full px-6 py-3 bg-white/70 backdrop-blur-sm border border-purple-200 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all hover:bg-white/90"
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400">
             {isSearching ? (
@@ -254,8 +340,8 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
       <div className={`transition-all duration-300 ease-in-out ${searchTerm ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
         <h2 className="text-xl font-bold mb-4 text-purple-800">Search Results</h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2 md:gap-6 md:px-6">
-          {searchResults.map(song => (
-            <div key={`search-${song.id}`} className="bg-gradient-to-br from-white to-purple-50/30 p-3 md:p-4 rounded-lg shadow-sm hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02]">
+          {searchResults.map((song, idx) => (
+            <div key={`search-${song.id}`} className="bg-gradient-to-br from-white/80 via-purple-50/30 to-pink-50/40 p-3 md:p-4 rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02] backdrop-blur-sm border border-white/50 animate-scale-fade-in" style={{animationDelay: `${idx * 150}ms`}}>
               <div className="relative">
                 <div className="bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-500 w-full aspect-square rounded-md mb-2 md:mb-4 flex items-center justify-center shadow-inner">
                   <svg className="h-12 w-12 md:h-16 md:w-16 text-white/90 drop-shadow" fill="currentColor" viewBox="0 0 24 24">
@@ -284,14 +370,14 @@ function MainContent({ musicLibrary, onPlayTrack, currentTrack, isPlaying, onSel
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-['Cinzel_Decorative']">Welcome to MelodyByte</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-['Cinzel_Decorative'] tracking-wide animate-scale-fade-in animation-delay-300">Welcome to MelodyByte</h1>
 
       {/* For You Section */}
       <div className="mb-8">
         <h2 className="text-xl font-bold mb-4 text-purple-800">For You</h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 px-2 md:gap-6 md:px-6">
-          {forYouSongs.map(song => (
-            <div key={`foryou-${song.id}`} className="bg-gradient-to-br from-white to-purple-50/30 p-3 md:p-4 rounded-lg shadow-sm hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02]">
+          {forYouSongs.map((song, idx) => (
+            <div key={`foryou-${song.id}`} className="bg-gradient-to-br from-white/80 via-purple-50/30 to-pink-50/40 p-3 md:p-4 rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02] backdrop-blur-sm border border-white/50 hover:border-purple-200/70 animate-scale-fade-in" style={{animationDelay: `${idx * 150}ms`}}>
               <div className="relative">
                 <div className="bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-500 w-full aspect-square rounded-md mb-2 md:mb-4 flex items-center justify-center shadow-inner">
                   <svg className="h-12 w-12 md:h-16 md:w-16 text-white/90 drop-shadow" fill="currentColor" viewBox="0 0 24 24">
@@ -712,7 +798,7 @@ function App() {
 
   return (
     <>
-    <div className="h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-purple-200 via-pink-100 to-indigo-200 relative overflow-hidden animate-blur-fade-in">
       <Header onSearchClick={() => setIsSearchModalOpen(true)} />
       <div className="flex-1 flex overflow-hidden pt-16">
         <div className="w-64 flex-shrink-0 hidden md:block">
